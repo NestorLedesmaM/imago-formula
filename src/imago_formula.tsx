@@ -5,11 +5,14 @@ const KATEX_JS  = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js";
 const H2I_JS    = "https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js";
 
 function loadScript(src) {
-  return new Promise((res, rej) => {
+  const loadScript = (src: string) =>
+  new Promise<void>((res, rej) => {
     if (document.querySelector(`script[src="${src}"]`)) { res(); return; }
-    const s = document.createElement("script");
-    s.src = src; s.onload = res; s.onerror = rej;
-    document.head.appendChild(s);
+    const script = document.createElement('script');
+    script.src = src;
+    script.onload = () => res();
+    script.onerror = () => rej();
+    document.head.appendChild(script);
   });
 }
 function loadCSS(href) {
@@ -79,7 +82,7 @@ const INDICATORS = [
 ];
 
 function KatexSpan({ tex }) {
-  const ref = useRef();
+  const ref = useRef<HTMLSpanElement | null>(null);
   useEffect(() => {
     if (!ref.current || !window.katex) return;
     try {
@@ -95,7 +98,7 @@ export default function App() {
   const [vars, setVars] = useState({});
   const [C, setC] = useState(1000);
   const [exporting, setExporting] = useState(null);
-  const previewRef = useRef();
+  const previewRef = useRef<HTMLDivElement | null>(null);
 
   const ind = INDICATORS.find(i => i.id === selId);
 
@@ -140,14 +143,15 @@ export default function App() {
     } finally { setExporting(null); }
   }
 
-  const btnBase = active => ({
-    padding: "8px 14px", borderRadius: 8, fontSize: 13, fontWeight: 500,
-    cursor: "pointer", transition: "all .15s", border: "1.5px solid",
-    borderColor: active ? "#4F46E5" : "var(--color-border-secondary)",
-    background: active ? "#EEF2FF" : "var(--color-background-primary)",
-    color: active ? "#3730A3" : "var(--color-text-primary)",
-    textAlign: "left",
-  });
+  const btnBase = (selected: boolean): React.CSSProperties => ({
+  padding: '6px',
+  borderRadius: '4px',
+  textAlign: 'center', // Al agregar React.CSSProperties arriba, esto se arregla automáticamente
+  cursor: 'pointer',
+  backgroundColor: selected ? '#0070f3' : '#fff',
+  color: selected ? '#fff' : '#000',
+  border: '1px solid #ccc'
+});
 
   return (
     <div style={{ fontFamily: "var(--font-sans)", padding: "1rem 0.5rem", maxWidth: 680 }}>
