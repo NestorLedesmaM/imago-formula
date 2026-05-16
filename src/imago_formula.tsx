@@ -1,9 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 
 const KATEX_CSS = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css";
-const KATEX_JS  = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js";
-const H2I_JS    = "https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js";
-
+const KATEX_JS = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js";
+const H2I_JS = "https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js";
 function loadScript(src) {
   const loadScript = (src: string) =>
   new Promise<void>((res, rej) => {
@@ -104,7 +103,9 @@ export default function App() {
 
   useEffect(() => {
     loadCSS(KATEX_CSS);
-    Promise.all([loadScript(KATEX_JS), loadScript(H2I_JS)]).then(() => setReady(true));
+    Promise.all([loadScript(KATEX_JS), loadScript(H2I_JS)]).then(() => {
+      setReady(true);
+    }).catch(err => console.error("Error cargando librerías:", err));
   }, []);
 
   function select(id) {
