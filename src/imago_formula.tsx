@@ -3,22 +3,35 @@ import { useState, useRef, useEffect, useCallback } from "react";
 const KATEX_CSS = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css";
 const KATEX_JS = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js";
 const H2I_JS = "https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js";
-function loadScript(src) {
-  const loadScript = (src: string) =>
-  new Promise<void>((res, rej) => {
-    if (document.querySelector(`script[src="${src}"]`)) { res(); return; }
-    const script = document.createElement('script');
+const loadScript = (src: string): Promise<void> => {
+  return new Promise((res, rej) => {
+    if (document.querySelector(`script[src="${src}"]`)) {
+      res();
+      return;
+    }
+    const script = document.createElement("script");
     script.src = src;
+    script.async = true;
     script.onload = () => res();
-    script.onerror = () => rej();
+    script.onerror = () => rej(new Error(`Error script: ${src}`));
     document.head.appendChild(script);
   });
-}
-function loadCSS(href) {
-  if (document.querySelector(`link[href="${href}"]`)) return;
-  const l = document.createElement("link"); l.rel = "stylesheet"; l.href = href;
-  document.head.appendChild(l);
-}
+};
+
+const loadCSS = (href: string): Promise<void> => {
+  return new Promise((res, rej) => {
+    if (document.querySelector(`link[href="${href}"]`)) {
+      res();
+      return;
+    }
+    const link = document.createElement("link");
+    link.href = href;
+    link.rel = "stylesheet";
+    link.onload = () => res();
+    link.onerror = () => rej(new Error(`Error CSS: ${href}`));
+    document.head.appendChild(link);
+  });
+};
 
 const C_OPTIONS = [10, 100, 1000, 10000];
 const fmt = n => n >= 1000 ? n.toLocaleString("es-PE") : String(n);
